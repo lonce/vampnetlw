@@ -1,0 +1,52 @@
+
+codec_ckpt: ./models/vampnet/weights_16khz.pth
+ # -v /scratch:/scratch in your docker run command line
+save_path: /scratch/lonce/ckpttmp
+
+num_iters:   10000
+save_iters: [2000, 4000,  6000, 8000, 10000]
+val_idx: [0,1,2,3,4,5,6,7,8,9]    # file indexes?
+sample_freq: 1000 #10000  
+val_freq: 1000  # I think this means validate to compute error and save best model so far every sample_freq training iterations
+
+batch_size: 10
+num_workers: 10
+
+# Optimization
+amp: False
+
+CrossEntropyLoss.label_smoothing: 0.1
+
+AdamW.lr: 0.001
+
+NoamScheduler.factor: 2.0
+NoamScheduler.warmup: 10000
+
+VampNet.vocab_size: 1024
+VampNet.n_codebooks: 4
+VampNet.n_conditioning_codebooks: 0
+VampNet.r_cond_dim: 0
+VampNet.noise_mode: mask
+VampNet.embedding_dim: 1280
+VampNet.n_layers: 20 #20
+VampNet.n_heads: 20 # 20
+VampNet.flash_attn: False
+VampNet.dropout: 0.1
+
+# Audiotools /home/lonce/miniconda3/envs/vampnet/lib/python3.9/site-packages/audiotools/data/datasets.py
+AudioLoader.relative_path: ""    # An Audiotools parameter (that I can't make work)
+AudioDataset.loudness_cutoff: -30.0
+AudioDataset.without_replacement: True # Whether to choose files with or without replacement, by default True.
+AudioLoader.shuffle: True
+
+AudioDataset.duration: 5.0
+
+train/AudioDataset.n_examples: 22428   # Number of examples (length of dataset), by default 1000
+train/AudioLoader.sources:
+  - /scratch/syntex/PisWinAppBee_long/audio-train
+
+
+val/AudioDataset.n_examples: 2520
+val/AudioLoader.sources:
+  - /scratch/syntex/PisWinAppBee_long/audio-val
+

@@ -1,0 +1,55 @@
+# docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile --tag lonce:mtcrnn ../
+FROM nvcr.io/nvidia/pytorch:22.05-py3
+
+
+# settings from upf: https://guiesbibtic.upf.edu/recerca/hpc/create-docker-image
+MAINTAINER Lonce Wyse "https://registry.sb.upf.edu"
+LABEL authors="Lonce Wyse lonce.wyse@upf.edu"
+LABEL description="environment for DL training of MTCRNN"
+
+# create a project directory inside user home
+ENV PROJECT_DIR /working
+RUN mkdir $PROJECT_DIR
+WORKDIR $PROJECT_DIR
+
+
+#COPY requirements.txt .
+COPY . $WORKDIR
+
+###########
+
+#(from descript) ARG IMAGE=pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+#(from descript)ARG GITHUB_TOKEN=none
+#(from descript) FROM $IMAGE
+#(from descript) COPY . /app
+#(from descript) WORKDIR /app
+#(from descript) RUN echo machine github.com login ${GITHUB_TOKEN} > ~/.netrc
+#(from descript) COPY requirements.txt /requirements.txt
+
+
+RUN apt update && apt install -y git
+RUN pip install --upgrade --ignore-installed "llvmlite<0.37,>=0.36.0rc1"
+
+# install the package
+#RUN pip install --upgrade -r requirements.txt
+RUN pip install -r requirements.txt
+RUN pip install .
+
+
+
+WORKDIR /vampnet
+
+
+ARG USER_ID
+ARG GROUP_ID
+
+RUN addgroup --gid $GROUP_ID user
+RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
+USER user
+
+# default command will launch JupyterLab server for development
+ENTRYPOINT /usr/bin/bash
+#CMD ["bash"]
+
+# to run (and use /scratch as for data and checkpoints):
+# docker run --ipc=host --gpus "device=0" -it -v $(pwd):/vampnet  -v /scratch:/scratch --rm lonce:vampnet

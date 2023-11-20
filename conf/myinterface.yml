@@ -1,0 +1,10 @@
+Interface.coarse_ckpt: /scratch/lonce/ckpttmp44/best/vampnet/weights.pth
+Interface.coarse2fine_ckpt: null
+Interface.codec_ckpt: ./models/vampnet/codec.pth
+Interface.coarse_chunk_size_s: 10
+Interface.coarse2fine_chunk_size_s: 3
+Interface.wavebeat_ckpt: ./models/wavebeat.pth
+
+# AudioLoader.sources:
+#   - /media/CHONK/null
+

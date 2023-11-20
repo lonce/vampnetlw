@@ -1,0 +1,532 @@
+usage: train.py [-h] [--args.save ARGS.SAVE] [--args.load ARGS.LOAD]
+                [--args.debug ARGS.DEBUG] [--amp]
+                [--CrossEntropyLoss.size_average CROSSENTROPYLOSS.SIZE_AVERAGE]
+                [--CrossEntropyLoss.ignore_index CROSSENTROPYLOSS.IGNORE_INDEX]
+                [--CrossEntropyLoss.reduce CROSSENTROPYLOSS.REDUCE]
+                [--CrossEntropyLoss.reduction CROSSENTROPYLOSS.REDUCTION]
+                [--CrossEntropyLoss.label_smoothing CROSSENTROPYLOSS.LABEL_SMOOTHING]
+                [--AdamW.lr ADAMW.LR] [--AdamW.betas ADAMW.BETAS]
+                [--AdamW.eps ADAMW.EPS]
+                [--AdamW.weight_decay ADAMW.WEIGHT_DECAY] [--AdamW.amsgrad]
+                [--AdamW.maximize] [--AdamW.capturable]
+                [--AdamW.differentiable]
+                [--NoamScheduler.d_model NOAMSCHEDULER.D_MODEL]
+                [--NoamScheduler.factor NOAMSCHEDULER.FACTOR]
+                [--NoamScheduler.warmup NOAMSCHEDULER.WARMUP]
+                [--BackgroundNoise.snr BACKGROUNDNOISE.SNR]
+                [--BackgroundNoise.sources BACKGROUNDNOISE.SOURCES]
+                [--BackgroundNoise.weights BACKGROUNDNOISE.WEIGHTS]
+                [--BackgroundNoise.eq_amount BACKGROUNDNOISE.EQ_AMOUNT]
+                [--BackgroundNoise.n_bands BACKGROUNDNOISE.N_BANDS]
+                [--BackgroundNoise.name BACKGROUNDNOISE.NAME]
+                [--BackgroundNoise.prob BACKGROUNDNOISE.PROB]
+                [--BackgroundNoise.loudness_cutoff BACKGROUNDNOISE.LOUDNESS_CUTOFF]
+                [--ClippingDistortion.perc CLIPPINGDISTORTION.PERC]
+                [--ClippingDistortion.name CLIPPINGDISTORTION.NAME]
+                [--ClippingDistortion.prob CLIPPINGDISTORTION.PROB]
+                [--CorruptPhase.scale CORRUPTPHASE.SCALE]
+                [--CorruptPhase.name CORRUPTPHASE.NAME]
+                [--CorruptPhase.prob CORRUPTPHASE.PROB]
+                [--CrossTalk.snr CROSSTALK.SNR]
+                [--CrossTalk.sources CROSSTALK.SOURCES]
+                [--CrossTalk.weights CROSSTALK.WEIGHTS]
+                [--CrossTalk.name CROSSTALK.NAME]
+                [--CrossTalk.prob CROSSTALK.PROB]
+                [--CrossTalk.loudness_cutoff CROSSTALK.LOUDNESS_CUTOFF]
+                [--Equalizer.eq_amount EQUALIZER.EQ_AMOUNT]
+                [--Equalizer.n_bands EQUALIZER.N_BANDS]
+                [--Equalizer.name EQUALIZER.NAME]
+                [--Equalizer.prob EQUALIZER.PROB]
+                [--FrequencyMask.f_center FREQUENCYMASK.F_CENTER]
+                [--FrequencyMask.f_width FREQUENCYMASK.F_WIDTH]
+                [--FrequencyMask.name FREQUENCYMASK.NAME]
+                [--FrequencyMask.prob FREQUENCYMASK.PROB]
+                [--FrequencyNoise.f_center FREQUENCYNOISE.F_CENTER]
+                [--FrequencyNoise.f_width FREQUENCYNOISE.F_WIDTH]
+                [--FrequencyNoise.name FREQUENCYNOISE.NAME]
+                [--FrequencyNoise.prob FREQUENCYNOISE.PROB]
+                [--GlobalVolumeNorm.db GLOBALVOLUMENORM.DB]
+                [--GlobalVolumeNorm.name GLOBALVOLUMENORM.NAME]
+                [--GlobalVolumeNorm.prob GLOBALVOLUMENORM.PROB]
+                [--HighPass.cutoff HIGHPASS.CUTOFF]
+                [--HighPass.zeros HIGHPASS.ZEROS]
+                [--HighPass.name HIGHPASS.NAME]
+                [--HighPass.prob HIGHPASS.PROB]
+                [--BaseTransform.keys BASETRANSFORM.KEYS]
+                [--BaseTransform.name BASETRANSFORM.NAME]
+                [--BaseTransform.prob BASETRANSFORM.PROB]
+                [--InvertPhase.name INVERTPHASE.NAME]
+                [--InvertPhase.prob INVERTPHASE.PROB]
+                [--LowPass.cutoff LOWPASS.CUTOFF]
+                [--LowPass.zeros LOWPASS.ZEROS] [--LowPass.name LOWPASS.NAME]
+                [--LowPass.prob LOWPASS.PROB]
+                [--MaskLowMagnitudes.db_cutoff MASKLOWMAGNITUDES.DB_CUTOFF]
+                [--MaskLowMagnitudes.name MASKLOWMAGNITUDES.NAME]
+                [--MaskLowMagnitudes.prob MASKLOWMAGNITUDES.PROB]
+                [--MuLawQuantization.channels MULAWQUANTIZATION.CHANNELS]
+                [--MuLawQuantization.name MULAWQUANTIZATION.NAME]
+                [--MuLawQuantization.prob MULAWQUANTIZATION.PROB]
+                [--NoiseFloor.db NOISEFLOOR.DB]
+                [--NoiseFloor.name NOISEFLOOR.NAME]
+                [--NoiseFloor.prob NOISEFLOOR.PROB]
+                [--Quantization.channels QUANTIZATION.CHANNELS]
+                [--Quantization.name QUANTIZATION.NAME]
+                [--Quantization.prob QUANTIZATION.PROB]
+                [--Repeat.n_repeat REPEAT.N_REPEAT]
+                [--Repeat.name REPEAT.NAME] [--Repeat.prob REPEAT.PROB]
+                [--RepeatUpTo.max_repeat REPEATUPTO.MAX_REPEAT]
+                [--RepeatUpTo.weights REPEATUPTO.WEIGHTS]
+                [--RepeatUpTo.name REPEATUPTO.NAME]
+                [--RepeatUpTo.prob REPEATUPTO.PROB]
+                [--RescaleAudio.val RESCALEAUDIO.VAL]
+                [--RescaleAudio.name RESCALEAUDIO.NAME]
+                [--RescaleAudio.prob RESCALEAUDIO.PROB]
+                [--RoomImpulseResponse.drr ROOMIMPULSERESPONSE.DRR]
+                [--RoomImpulseResponse.sources ROOMIMPULSERESPONSE.SOURCES]
+                [--RoomImpulseResponse.weights ROOMIMPULSERESPONSE.WEIGHTS]
+                [--RoomImpulseResponse.eq_amount ROOMIMPULSERESPONSE.EQ_AMOUNT]
+                [--RoomImpulseResponse.n_bands ROOMIMPULSERESPONSE.N_BANDS]
+                [--RoomImpulseResponse.name ROOMIMPULSERESPONSE.NAME]
+                [--RoomImpulseResponse.prob ROOMIMPULSERESPONSE.PROB]
+                [--RoomImpulseResponse.use_original_phase]
+                [--RoomImpulseResponse.offset ROOMIMPULSERESPONSE.OFFSET]
+                [--RoomImpulseResponse.duration ROOMIMPULSERESPONSE.DURATION]
+                [--ShiftPhase.shift SHIFTPHASE.SHIFT]
+                [--ShiftPhase.name SHIFTPHASE.NAME]
+                [--ShiftPhase.prob SHIFTPHASE.PROB]
+                [--Silence.name SILENCE.NAME] [--Silence.prob SILENCE.PROB]
+                [--Smoothing.window_type SMOOTHING.WINDOW_TYPE]
+                [--Smoothing.window_length SMOOTHING.WINDOW_LENGTH]
+                [--Smoothing.name SMOOTHING.NAME]
+                [--Smoothing.prob SMOOTHING.PROB]
+                [--SpectralDenoising.eq_amount SPECTRALDENOISING.EQ_AMOUNT]
+                [--SpectralDenoising.denoise_amount SPECTRALDENOISING.DENOISE_AMOUNT]
+                [--SpectralDenoising.nz_volume SPECTRALDENOISING.NZ_VOLUME]
+                [--SpectralDenoising.n_bands SPECTRALDENOISING.N_BANDS]
+                [--SpectralDenoising.n_freq SPECTRALDENOISING.N_FREQ]
+                [--SpectralDenoising.n_time SPECTRALDENOISING.N_TIME]
+                [--SpectralDenoising.name SPECTRALDENOISING.NAME]
+                [--SpectralDenoising.prob SPECTRALDENOISING.PROB]
+                [--TimeMask.t_center TIMEMASK.T_CENTER]
+                [--TimeMask.t_width TIMEMASK.T_WIDTH]
+                [--TimeMask.name TIMEMASK.NAME]
+                [--TimeMask.prob TIMEMASK.PROB]
+                [--TimeNoise.t_center TIMENOISE.T_CENTER]
+                [--TimeNoise.t_width TIMENOISE.T_WIDTH]
+                [--TimeNoise.name TIMENOISE.NAME]
+                [--TimeNoise.prob TIMENOISE.PROB]
+                [--VolumeChange.db VOLUMECHANGE.DB]
+                [--VolumeChange.name VOLUMECHANGE.NAME]
+                [--VolumeChange.prob VOLUMECHANGE.PROB]
+                [--VolumeNorm.db VOLUMENORM.DB]
+                [--VolumeNorm.name VOLUMENORM.NAME]
+                [--VolumeNorm.prob VOLUMENORM.PROB]
+                [--VampNet.n_heads VAMPNET.N_HEADS]
+                [--VampNet.n_layers VAMPNET.N_LAYERS]
+                [--VampNet.r_cond_dim VAMPNET.R_COND_DIM]
+                [--VampNet.n_codebooks VAMPNET.N_CODEBOOKS]
+                [--VampNet.n_conditioning_codebooks VAMPNET.N_CONDITIONING_CODEBOOKS]
+                [--VampNet.latent_dim VAMPNET.LATENT_DIM]
+                [--VampNet.embedding_dim VAMPNET.EMBEDDING_DIM]
+                [--VampNet.vocab_size VAMPNET.VOCAB_SIZE]
+                [--VampNet.flash_attn]
+                [--VampNet.noise_mode VAMPNET.NOISE_MODE]
+                [--VampNet.dropout VAMPNET.DROPOUT]
+                     /* an Audiotools thing: /home/lonce/miniconda3/envs/vampnet/lib/python3.9/site-packages/audiotools/data/datasets.py
+                [--AudioLoader.sources AUDIOLOADER.SOURCES]
+                [--AudioLoader.weights AUDIOLOADER.WEIGHTS]
+                [--AudioLoader.relative_path AUDIOLOADER.RELATIVE_PATH] /* Path audio should be loaded relative to, by default "" */
+                [--AudioLoader.ext AUDIOLOADER.EXT] [--AudioLoader.shuffle]
+                [--AudioLoader.shuffle_state AUDIOLOADER.SHUFFLE_STATE]
+                [--AudioDataset.n_examples AUDIODATASET.N_EXAMPLES]
+                [--AudioDataset.duration AUDIODATASET.DURATION]
+                [--AudioDataset.offset AUDIODATASET.OFFSET]
+                [--AudioDataset.loudness_cutoff AUDIODATASET.LOUDNESS_CUTOFF]
+                [--AudioDataset.num_channels AUDIODATASET.NUM_CHANNELS]
+                [--AudioDataset.aligned] [--AudioDataset.shuffle_loaders]
+                [--AudioDataset.without_replacement] [--resume] [--tag TAG]
+                [--grad_clip_val GRAD_CLIP_VAL] [--seed SEED]
+                [--codec_ckpt CODEC_CKPT] [--save_path SAVE_PATH]
+                [--num_iters NUM_ITERS] [--save_iters SAVE_ITERS]
+                [--sample_freq SAMPLE_FREQ] [--val_freq VAL_FREQ]
+                [--batch_size BATCH_SIZE] [--val_idx VAL_IDX]
+                [--num_workers NUM_WORKERS] [--fine_tune]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --args.save ARGS.SAVE
+                        Path to save all arguments used to run script to.
+  --args.load ARGS.LOAD
+                        Path to load arguments from, stored as a .yml file.
+  --args.debug ARGS.DEBUG
+                        Print arguments as they are passed to each function.
+
+Generated arguments for function Accelerator:
+
+  --amp
+
+Generated arguments for function CrossEntropyLoss:
+
+  --CrossEntropyLoss.size_average CROSSENTROPYLOSS.SIZE_AVERAGE
+  --CrossEntropyLoss.ignore_index CROSSENTROPYLOSS.IGNORE_INDEX
+  --CrossEntropyLoss.reduce CROSSENTROPYLOSS.REDUCE
+  --CrossEntropyLoss.reduction CROSSENTROPYLOSS.REDUCTION
+  --CrossEntropyLoss.label_smoothing CROSSENTROPYLOSS.LABEL_SMOOTHING
+
+Generated arguments for function AdamW:
+
+  --AdamW.lr ADAMW.LR
+  --AdamW.betas ADAMW.BETAS
+  --AdamW.eps ADAMW.EPS
+  --AdamW.weight_decay ADAMW.WEIGHT_DECAY
+  --AdamW.amsgrad
+  --AdamW.maximize
+  --AdamW.capturable
+  --AdamW.differentiable
+
+Generated arguments for function NoamScheduler:
+
+  --NoamScheduler.d_model NOAMSCHEDULER.D_MODEL
+  --NoamScheduler.factor NOAMSCHEDULER.FACTOR
+  --NoamScheduler.warmup NOAMSCHEDULER.WARMUP
+
+Generated arguments for function BackgroundNoise:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/BackgroundNoise.loudness_cutoff VALUE.
+
+  --BackgroundNoise.snr BACKGROUNDNOISE.SNR
+  --BackgroundNoise.sources BACKGROUNDNOISE.SOURCES
+  --BackgroundNoise.weights BACKGROUNDNOISE.WEIGHTS
+  --BackgroundNoise.eq_amount BACKGROUNDNOISE.EQ_AMOUNT
+  --BackgroundNoise.n_bands BACKGROUNDNOISE.N_BANDS
+  --BackgroundNoise.name BACKGROUNDNOISE.NAME
+  --BackgroundNoise.prob BACKGROUNDNOISE.PROB
+  --BackgroundNoise.loudness_cutoff BACKGROUNDNOISE.LOUDNESS_CUTOFF
+
+Generated arguments for function ClippingDistortion:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/ClippingDistortion.prob VALUE.
+
+  --ClippingDistortion.perc CLIPPINGDISTORTION.PERC
+  --ClippingDistortion.name CLIPPINGDISTORTION.NAME
+  --ClippingDistortion.prob CLIPPINGDISTORTION.PROB
+
+Generated arguments for function CorruptPhase:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/CorruptPhase.prob VALUE.
+
+  --CorruptPhase.scale CORRUPTPHASE.SCALE
+  --CorruptPhase.name CORRUPTPHASE.NAME
+  --CorruptPhase.prob CORRUPTPHASE.PROB
+
+Generated arguments for function CrossTalk:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/CrossTalk.loudness_cutoff VALUE.
+
+  --CrossTalk.snr CROSSTALK.SNR
+  --CrossTalk.sources CROSSTALK.SOURCES
+  --CrossTalk.weights CROSSTALK.WEIGHTS
+  --CrossTalk.name CROSSTALK.NAME
+  --CrossTalk.prob CROSSTALK.PROB
+  --CrossTalk.loudness_cutoff CROSSTALK.LOUDNESS_CUTOFF
+
+Generated arguments for function Equalizer:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/Equalizer.prob VALUE.
+
+  --Equalizer.eq_amount EQUALIZER.EQ_AMOUNT
+  --Equalizer.n_bands EQUALIZER.N_BANDS
+  --Equalizer.name EQUALIZER.NAME
+  --Equalizer.prob EQUALIZER.PROB
+
+Generated arguments for function FrequencyMask:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/FrequencyMask.prob VALUE.
+
+  --FrequencyMask.f_center FREQUENCYMASK.F_CENTER
+  --FrequencyMask.f_width FREQUENCYMASK.F_WIDTH
+  --FrequencyMask.name FREQUENCYMASK.NAME
+  --FrequencyMask.prob FREQUENCYMASK.PROB
+
+Generated arguments for function FrequencyNoise:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/FrequencyNoise.prob VALUE.
+
+  --FrequencyNoise.f_center FREQUENCYNOISE.F_CENTER
+  --FrequencyNoise.f_width FREQUENCYNOISE.F_WIDTH
+  --FrequencyNoise.name FREQUENCYNOISE.NAME
+  --FrequencyNoise.prob FREQUENCYNOISE.PROB
+
+Generated arguments for function GlobalVolumeNorm:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/GlobalVolumeNorm.prob VALUE.
+
+  --GlobalVolumeNorm.db GLOBALVOLUMENORM.DB
+  --GlobalVolumeNorm.name GLOBALVOLUMENORM.NAME
+  --GlobalVolumeNorm.prob GLOBALVOLUMENORM.PROB
+
+Generated arguments for function HighPass:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/HighPass.prob VALUE.
+
+  --HighPass.cutoff HIGHPASS.CUTOFF
+  --HighPass.zeros HIGHPASS.ZEROS
+  --HighPass.name HIGHPASS.NAME
+  --HighPass.prob HIGHPASS.PROB
+
+Generated arguments for function BaseTransform:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/BaseTransform.prob VALUE.
+
+  --BaseTransform.keys BASETRANSFORM.KEYS
+  --BaseTransform.name BASETRANSFORM.NAME
+  --BaseTransform.prob BASETRANSFORM.PROB
+
+Generated arguments for function InvertPhase:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/InvertPhase.prob VALUE.
+
+  --InvertPhase.name INVERTPHASE.NAME
+  --InvertPhase.prob INVERTPHASE.PROB
+
+Generated arguments for function LowPass:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/LowPass.prob VALUE.
+
+  --LowPass.cutoff LOWPASS.CUTOFF
+  --LowPass.zeros LOWPASS.ZEROS
+  --LowPass.name LOWPASS.NAME
+  --LowPass.prob LOWPASS.PROB
+
+Generated arguments for function MaskLowMagnitudes:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/MaskLowMagnitudes.prob VALUE.
+
+  --MaskLowMagnitudes.db_cutoff MASKLOWMAGNITUDES.DB_CUTOFF
+  --MaskLowMagnitudes.name MASKLOWMAGNITUDES.NAME
+  --MaskLowMagnitudes.prob MASKLOWMAGNITUDES.PROB
+
+Generated arguments for function MuLawQuantization:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/MuLawQuantization.prob VALUE.
+
+  --MuLawQuantization.channels MULAWQUANTIZATION.CHANNELS
+  --MuLawQuantization.name MULAWQUANTIZATION.NAME
+  --MuLawQuantization.prob MULAWQUANTIZATION.PROB
+
+Generated arguments for function NoiseFloor:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/NoiseFloor.prob VALUE.
+
+  --NoiseFloor.db NOISEFLOOR.DB
+  --NoiseFloor.name NOISEFLOOR.NAME
+  --NoiseFloor.prob NOISEFLOOR.PROB
+
+Generated arguments for function Quantization:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/Quantization.prob VALUE.
+
+  --Quantization.channels QUANTIZATION.CHANNELS
+  --Quantization.name QUANTIZATION.NAME
+  --Quantization.prob QUANTIZATION.PROB
+
+Generated arguments for function Repeat:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/Repeat.prob VALUE.
+
+  --Repeat.n_repeat REPEAT.N_REPEAT
+  --Repeat.name REPEAT.NAME
+  --Repeat.prob REPEAT.PROB
+
+Generated arguments for function RepeatUpTo:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/RepeatUpTo.prob VALUE.
+
+  --RepeatUpTo.max_repeat REPEATUPTO.MAX_REPEAT
+  --RepeatUpTo.weights REPEATUPTO.WEIGHTS
+  --RepeatUpTo.name REPEATUPTO.NAME
+  --RepeatUpTo.prob REPEATUPTO.PROB
+
+Generated arguments for function RescaleAudio:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/RescaleAudio.prob VALUE.
+
+  --RescaleAudio.val RESCALEAUDIO.VAL
+  --RescaleAudio.name RESCALEAUDIO.NAME
+  --RescaleAudio.prob RESCALEAUDIO.PROB
+
+Generated arguments for function RoomImpulseResponse:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/RoomImpulseResponse.duration VALUE.
+
+  --RoomImpulseResponse.drr ROOMIMPULSERESPONSE.DRR
+  --RoomImpulseResponse.sources ROOMIMPULSERESPONSE.SOURCES
+  --RoomImpulseResponse.weights ROOMIMPULSERESPONSE.WEIGHTS
+  --RoomImpulseResponse.eq_amount ROOMIMPULSERESPONSE.EQ_AMOUNT
+  --RoomImpulseResponse.n_bands ROOMIMPULSERESPONSE.N_BANDS
+  --RoomImpulseResponse.name ROOMIMPULSERESPONSE.NAME
+  --RoomImpulseResponse.prob ROOMIMPULSERESPONSE.PROB
+  --RoomImpulseResponse.use_original_phase
+  --RoomImpulseResponse.offset ROOMIMPULSERESPONSE.OFFSET
+  --RoomImpulseResponse.duration ROOMIMPULSERESPONSE.DURATION
+
+Generated arguments for function ShiftPhase:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/ShiftPhase.prob VALUE.
+
+  --ShiftPhase.shift SHIFTPHASE.SHIFT
+  --ShiftPhase.name SHIFTPHASE.NAME
+  --ShiftPhase.prob SHIFTPHASE.PROB
+
+Generated arguments for function Silence:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/Silence.prob VALUE.
+
+  --Silence.name SILENCE.NAME
+  --Silence.prob SILENCE.PROB
+
+Generated arguments for function Smoothing:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/Smoothing.prob VALUE.
+
+  --Smoothing.window_type SMOOTHING.WINDOW_TYPE
+  --Smoothing.window_length SMOOTHING.WINDOW_LENGTH
+  --Smoothing.name SMOOTHING.NAME
+  --Smoothing.prob SMOOTHING.PROB
+
+Generated arguments for function SpectralDenoising:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/SpectralDenoising.prob VALUE.
+
+  --SpectralDenoising.eq_amount SPECTRALDENOISING.EQ_AMOUNT
+  --SpectralDenoising.denoise_amount SPECTRALDENOISING.DENOISE_AMOUNT
+  --SpectralDenoising.nz_volume SPECTRALDENOISING.NZ_VOLUME
+  --SpectralDenoising.n_bands SPECTRALDENOISING.N_BANDS
+  --SpectralDenoising.n_freq SPECTRALDENOISING.N_FREQ
+  --SpectralDenoising.n_time SPECTRALDENOISING.N_TIME
+  --SpectralDenoising.name SPECTRALDENOISING.NAME
+  --SpectralDenoising.prob SPECTRALDENOISING.PROB
+
+Generated arguments for function TimeMask:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/TimeMask.prob VALUE.
+
+  --TimeMask.t_center TIMEMASK.T_CENTER
+  --TimeMask.t_width TIMEMASK.T_WIDTH
+  --TimeMask.name TIMEMASK.NAME
+  --TimeMask.prob TIMEMASK.PROB
+
+Generated arguments for function TimeNoise:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/TimeNoise.prob VALUE.
+
+  --TimeNoise.t_center TIMENOISE.T_CENTER
+  --TimeNoise.t_width TIMENOISE.T_WIDTH
+  --TimeNoise.name TIMENOISE.NAME
+  --TimeNoise.prob TIMENOISE.PROB
+
+Generated arguments for function VolumeChange:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/VolumeChange.prob VALUE.
+
+  --VolumeChange.db VOLUMECHANGE.DB
+  --VolumeChange.name VOLUMECHANGE.NAME
+  --VolumeChange.prob VOLUMECHANGE.PROB
+
+Generated arguments for function VolumeNorm:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/VolumeNorm.prob VALUE.
+
+  --VolumeNorm.db VOLUMENORM.DB
+  --VolumeNorm.name VOLUMENORM.NAME
+  --VolumeNorm.prob VOLUMENORM.PROB
+
+Generated arguments for function VampNet:
+
+  --VampNet.n_heads VAMPNET.N_HEADS
+  --VampNet.n_layers VAMPNET.N_LAYERS
+  --VampNet.r_cond_dim VAMPNET.R_COND_DIM
+  --VampNet.n_codebooks VAMPNET.N_CODEBOOKS
+  --VampNet.n_conditioning_codebooks VAMPNET.N_CONDITIONING_CODEBOOKS
+  --VampNet.latent_dim VAMPNET.LATENT_DIM
+  --VampNet.embedding_dim VAMPNET.EMBEDDING_DIM
+  --VampNet.vocab_size VAMPNET.VOCAB_SIZE
+  --VampNet.flash_attn
+  --VampNet.noise_mode VAMPNET.NOISE_MODE
+  --VampNet.dropout VAMPNET.DROPOUT
+
+Generated arguments for function AudioLoader:
+
+  --AudioLoader.sources AUDIOLOADER.SOURCES
+  --AudioLoader.weights AUDIOLOADER.WEIGHTS
+  --AudioLoader.relative_path AUDIOLOADER.RELATIVE_PATH
+  --AudioLoader.ext AUDIOLOADER.EXT
+  --AudioLoader.shuffle
+  --AudioLoader.shuffle_state AUDIOLOADER.SHUFFLE_STATE
+
+Generated arguments for function AudioDataset:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/AudioDataset.without_replacement VALUE.
+
+  --AudioDataset.n_examples AUDIODATASET.N_EXAMPLES
+  --AudioDataset.duration AUDIODATASET.DURATION
+  --AudioDataset.offset AUDIODATASET.OFFSET
+  --AudioDataset.loudness_cutoff AUDIODATASET.LOUDNESS_CUTOFF
+  --AudioDataset.num_channels AUDIODATASET.NUM_CHANNELS
+  --AudioDataset.aligned
+  --AudioDataset.shuffle_loaders
+  --AudioDataset.without_replacement
+
+Generated arguments for function build_transform:
+   Additional scope patterns: train, val. Use these by
+  prefacing any of the args below with one of these patterns.
+  For example: --train/without_replacement VALUE.
+
+Generated arguments for function load:
+
+  --resume
+  --tag TAG
+  --grad_clip_val GRAD_CLIP_VAL
+
+Generated arguments for function train:
+
+  --seed SEED
+  --codec_ckpt CODEC_CKPT
+  --save_path SAVE_PATH
+  --num_iters NUM_ITERS
+  --save_iters SAVE_ITERS
+  --sample_freq SAMPLE_FREQ
+  --val_freq VAL_FREQ
+  --batch_size BATCH_SIZE
+  --val_idx VAL_IDX
+  --num_workers NUM_WORKERS
+  --fine_tune
